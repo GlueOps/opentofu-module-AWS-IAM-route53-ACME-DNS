@@ -6,6 +6,7 @@ data "aws_iam_policy_document" "acme_dns01" {
 
     actions = [
       "route53:ListHostedZones",
+      "route53:ListHostedZonesByName",
     ]
 
     resources = ["*"]
