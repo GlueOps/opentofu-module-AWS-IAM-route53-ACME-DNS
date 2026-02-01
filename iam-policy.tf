@@ -1,37 +1,15 @@
 data "aws_iam_policy_document" "acme_dns01" {
   # Read-only permissions for zone discovery and change status
   statement {
-    sid    = "AllowListHostedZones"
+    sid    = "AllowRoute53ReadAccess"
     effect = "Allow"
 
     actions = [
       "route53:ListHostedZones",
-      "route53:ListHostedZonesByName",
-    ]
-
-    resources = ["*"]
-  }
-
-  statement {
-    sid    = "AllowGetChange"
-    effect = "Allow"
-
-    actions = [
       "route53:GetChange",
     ]
 
-    resources = ["arn:aws:route53:::change/*"]
-  }
-
-  statement {
-    sid    = "AllowListResourceRecordSets"
-    effect = "Allow"
-
-    actions = [
-      "route53:ListResourceRecordSets",
-    ]
-
-    resources = ["arn:aws:route53:::hostedzone/${var.hosted_zone_id}"]
+    resources = ["*"]
   }
 
   # Write permission restricted to specific TXT records for ACME challenges
@@ -44,19 +22,6 @@ data "aws_iam_policy_document" "acme_dns01" {
     ]
 
     resources = ["arn:aws:route53:::hostedzone/${var.hosted_zone_id}"]
-
-    # Ensure the context keys are present (prevent empty set bypass)
-    condition {
-      test     = "Null"
-      variable = "route53:ChangeResourceRecordSetsRecordTypes"
-      values   = ["false"]
-    }
-
-    condition {
-      test     = "Null"
-      variable = "route53:ChangeResourceRecordSetsNormalizedRecordNames"
-      values   = ["false"]
-    }
 
     # Restrict to TXT records only
     condition {
